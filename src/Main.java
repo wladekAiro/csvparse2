@@ -19,11 +19,14 @@ public class Main {
         String del = getDelimiter();
         List<String> erroredLines = new ArrayList<>();
         List<Student> students = new ArrayList<>();
+        String fileHeader = null;
 
-        processFile(del,filePath,erroredLines,students);
+        fileHeader = processFile(del,filePath,erroredLines,students,fileHeader);
 
         if (!students.isEmpty()){
             System.out.println(" STUDENTS FOUND =  " + students.size());
+            System.out.println(" ");
+            System.out.println(fileHeader);
 
             for (Student student : students){
                 System.out.println(student.toString());
@@ -65,22 +68,28 @@ public class Main {
         return del;
     }
 
-    private static void processFile(String del, String filePath, List<String> erroredLines, List<Student> students) {
+    private static String processFile(String del, String filePath, List<String> erroredLines, List<Student> students,
+                                      String fileHeader) {
 
         String line;
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
 
             int lineNumber = 1;
+
             while ((line = br.readLine()) != null) {
 
                 if (!line.contains(del)) {
                     del = getDelimiter();
                 }
 
-                // use del as separator
-                String[] fileLine = line.split(del);
-                validateFileLine(lineNumber, fileLine, erroredLines, students);
+                if (lineNumber > 1) {
+                    // use del as separator
+                    String[] fileLine = line.split(del);
+                    validateFileLine(lineNumber, fileLine, erroredLines, students);
+                }else {
+                    fileHeader = line;
+                }
 
                 lineNumber++;
             }
@@ -88,6 +97,8 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return fileHeader;
     }
 
     private static void validateFileLine(int lineNumber, String[] fileLine, List<String> erroredLines, List<Student> students) {
